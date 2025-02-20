@@ -27,10 +27,16 @@ class Chimaera extends BaseLLM {
     payload: any,
     signal: AbortSignal,
   ): AsyncGenerator<T> {
-    const combinedMessages = payload.messages
-      .map((message) => message.content.map((part) => part.text).join(""))
-      .flat()
-      .join("\n");
+    let combinedMessages: string = "";
+    if (Array.isArray(payload.messages)) {
+      combinedMessages = payload.messages
+        .map((message) => {
+          if (typeof message.content === "string") return message.content;
+          else return message.content.map((part) => part.text).join("");
+        })
+        .flat()
+        .join("\n");
+    }
 
     const formattedMessage = { user: { content: combinedMessages } };
 

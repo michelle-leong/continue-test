@@ -143,6 +143,7 @@ export async function* streamWebSocket<T>(
 
   let finished = false;
   let finalContentYielded = false;
+  let aggregatedContent = "";
 
   ws.onmessage = (event) => {
     let dataString: string;
@@ -158,6 +159,8 @@ export async function* streamWebSocket<T>(
 
     const data = JSON.parse(dataString);
     if (data.agent && data.agent.eventType === "kDelta") {
+      // Append to aggregated content
+      aggregatedContent += data.agent.content;
       // Resolve the promise with the new content
       resolveMessage(data.agent.content as T);
       // Create a new promise for the next message
@@ -166,8 +169,10 @@ export async function* streamWebSocket<T>(
         rejectMessage = reject;
       });
     } else if (data.agent && data.agent.eventType === "kFinish") {
-      // Resolve the promise with the final content and mark as finished
-      resolveMessage(data.agent.content as T);
+      // Check if the final content is different from the aggregated content
+      if (data.agent.content !== aggregatedContent) {
+        resolveMessage(data.agent.content as T);
+      }
       finished = true;
       ws.close();
     }

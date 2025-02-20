@@ -92,7 +92,7 @@ export default function StepContainer(props: StepContainerProps) {
           </pre>
         ) : (
           <>
-            <Reasoning {...props}/>
+            <Reasoning {...props} />
 
             <StyledMarkdownPreview
               isRenderingInStepContainer
