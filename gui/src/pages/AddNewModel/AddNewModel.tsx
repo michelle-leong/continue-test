@@ -39,6 +39,7 @@ const GridDiv = styled.div`
  */
 const modelsByProvider: Record<string, ModelPackage[]> = {
   "Open AI": [models.gpt4turbo, models.gpt4o, models.gpt35turbo],
+  Chimaera: [models.chimaera],
   Anthropic: [models.claude3Opus, models.claude3Sonnet, models.claude35Haiku],
   Mistral: [
     models.codestral,
@@ -66,13 +67,15 @@ function AddNewModel() {
 
   const [providersSelected, setProvidersSelected] = React.useState(true);
 
+  console.log(Object.entries(modelsByProvider));
+
   return (
     <div className="mb-6 overflow-y-scroll">
       <div
         className="sticky top-0 m-0 flex items-center p-0"
         style={{
           borderBottom: `0.5px solid ${lightGray}`,
-          backgroundColor: vscBackground,
+          backgroundColor: "red",
           zIndex: 2,
         }}
       >
@@ -165,7 +168,7 @@ function AddNewModel() {
                       style={{
                         height: "0px",
                         width: "100%",
-                        color: lightGray,
+                        color: "blue",
                         border: `1px solid ${lightGray}`,
                         borderRadius: "2px",
                       }}

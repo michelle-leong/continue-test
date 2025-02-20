@@ -14,6 +14,7 @@ import Azure from "./Azure";
 import Bedrock from "./Bedrock";
 import BedrockImport from "./BedrockImport";
 import Cerebras from "./Cerebras";
+import Chimaera from "./Chimaera";
 import Cloudflare from "./Cloudflare";
 import Cohere from "./Cohere";
 import DeepInfra from "./DeepInfra";
@@ -56,6 +57,7 @@ import xAI from "./xAI";
 
 export const LLMClasses = [
   Anthropic,
+  Chimaera,
   Cohere,
   FreeTrial,
   FunctionNetwork,

@@ -167,6 +167,7 @@ function autodetectTemplateType(model: string): TemplateType | undefined {
 
   if (
     lower.includes("gpt") ||
+    lower.includes("chimaera") ||
     lower.includes("command") ||
     lower.includes("chat-bison") ||
     lower.includes("pplx") ||
@@ -278,6 +279,7 @@ function autodetectTemplateFunction(
       zephyr: zephyrTemplateMessages,
       anthropic: anthropicTemplateMessages,
       chatml: chatmlTemplateMessages,
+      chimaera: chatmlTemplateMessages,
       deepseek: deepseekTemplateMessages,
       openchat: openchatTemplateMessages,
       "xwin-coder": xWinCoderTemplateMessages,

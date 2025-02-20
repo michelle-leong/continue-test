@@ -45,8 +45,8 @@ function claude35SonnetLazyApplyPrompt(
   `;
 
   return [
-    { role: "user", content: userContent },
-    { role: "assistant", content: assistantContent },
+    { user: { content: userContent } },
+    { agent: { content: assistantContent } },
   ];
 }
 

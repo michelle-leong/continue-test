@@ -191,6 +191,19 @@ export const providers: Partial<Record<string, ProviderInfo>> = {
     ],
     apiKeyUrl: "https://console.scaleway.com/iam/api-keys",
   },
+  chimaera: {
+    title: "Chimaera",
+    provider: "chimaera",
+    description:
+      "Azure OpenAI Service offers industry-leading coding and language AI models that you can fine-tune to your specific needs for a variety of use cases.",
+    longDescription: `[Visit our documentation](https://docs.continue.dev/reference/Model%20Providers/azure) for information on obtaining an API key.
+
+Select the \`GPT-4o\` model below to complete your provider configuration, but note that this will not affect the specific model you need to select when creating your Azure deployment.`,
+    icon: "azure.png",
+    tags: [],
+    packages: [models.chimaera],
+    collectInputFor: [],
+  },
   azure: {
     title: "Azure OpenAI",
     provider: "azure",

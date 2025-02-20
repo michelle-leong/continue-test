@@ -80,7 +80,7 @@ export abstract class BaseLLM implements ILLM {
   }
 
   supportsCompletions(): boolean {
-    if (["openai", "azure"].includes(this.providerName)) {
+    if (["openai", "azure", "chimaera"].includes(this.providerName)) {
       if (
         this.apiBase?.includes("api.groq.com") ||
         this.apiBase?.includes("api.mistral.ai") ||
@@ -724,6 +724,7 @@ export abstract class BaseLLM implements ILLM {
     completionOptions = this._modifyCompletionOptions(completionOptions);
 
     const messages = this._compileChatMessages(completionOptions, _messages);
+    console.log("messages", messages);
 
     const prompt = this.templateMessages
       ? this.templateMessages(messages)

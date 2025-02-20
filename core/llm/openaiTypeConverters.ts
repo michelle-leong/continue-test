@@ -17,58 +17,50 @@ import {
   TextMessagePart,
 } from "..";
 
-export function toChatMessage(
-  message: ChatMessage,
-): ChatCompletionMessageParam {
-  if (message.role === "tool") {
+export function toChatMessage(message: ChatMessage) {
+  console.log("message in to chat message", message);
+  if ("tool" in message) {
     return {
       role: "tool",
       content: message.content,
       tool_call_id: message.toolCallId,
     };
   }
-  if (message.role === "system") {
+  if ("agent" in message) {
     return {
       role: "system",
       content: message.content,
     };
   }
 
-  if (message.role === "assistant") {
-    const msg: ChatCompletionAssistantMessageParam = {
-      role: "assistant",
-      content:
-        typeof message.content === "string"
-          ? message.content || " " // LM Studio (and other providers) don't accept empty content
-          : message.content
-              .filter((part) => part.type === "text")
-              .map((part) => part as TextMessagePart), // can remove with newer typescript version
-    };
+  // if ("agent" in message) {
+  //   const msg: ChatCompletionAssistantMessageParam = {
+  //     agent: {
+  //       content:
+  //         typeof message.content === "string"
+  //           ? message.content || " " // LM Studio (and other providers) don't accept empty content
+  //           : message.content
+  //               .filter((part) => part.type === "text")
+  //               .map((part) => part as TextMessagePart), // can remove with newer typescript version
+  //     },
+  //   };
 
-    if (message.toolCalls) {
-      msg.tool_calls = message.toolCalls.map((toolCall) => ({
-        id: toolCall.id!,
-        type: toolCall.type!,
-        function: {
-          name: toolCall.function?.name!,
-          arguments: toolCall.function?.arguments!,
-        },
-      }));
-    }
-    return msg;
-  } else {
-    if (typeof message.content === "string") {
-      return {
-        role: "user",
-        content: message.content ?? " ", // LM Studio (and other providers) don't accept empty content
-      };
-    }
+  //   return msg;
+  // } else {
+  //   if (typeof message.content === "string") {
+  //     return {
+  //       role: "user",
+  //       content: message.content ?? " ", // LM Studio (and other providers) don't accept empty content
+  //     };
+  //   }
 
-    // If no multi-media is in the message, just send as text
-    // for compatibility with OpenAI-"compatible" servers
-    // that don't support multi-media format
-    return {
-      role: "user",
+  // If no multi-media is in the message, just send as text
+  // for compatibility with OpenAI-"compatible" servers
+  // that don't support multi-media format
+
+  console.log("message in to chat", message);
+  return {
+    user: {
       content: !message.content.some((item) => item.type !== "text")
         ? message.content
             .map((item) => (item as TextMessagePart).text)
@@ -85,8 +77,8 @@ export function toChatMessage(
             }
             return part;
           }),
-    };
-  }
+    },
+  };
 }
 
 export function toChatBody(

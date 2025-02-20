@@ -311,7 +311,7 @@ function ModelSelect() {
         dispatch(setDefaultModel({ title: val }));
       }}
     >
-      <div className="relative">
+      <div className="background-red relative">
         <StyledListboxButton
           data-testid="model-select-button"
           ref={buttonRef}

@@ -43,13 +43,13 @@ export interface IndexingProgressUpdate {
   desc: string;
   shouldClearIndexes?: boolean;
   status:
-  | "loading"
-  | "indexing"
-  | "done"
-  | "failed"
-  | "paused"
-  | "disabled"
-  | "cancelled";
+    | "loading"
+    | "indexing"
+    | "done"
+    | "failed"
+    | "paused"
+    | "disabled"
+    | "cancelled";
   debugInfo?: string;
 }
 
@@ -308,7 +308,57 @@ export interface CompletionOptions extends BaseCompletionOptions {
   model: string;
 }
 
-export type ChatMessageRole = "user" | "assistant" | "system" | "tool";
+export type PluginInfo = {
+  name: string;
+  action: string;
+  input: string;
+  icon: string;
+};
+
+export type UserMessage = {
+  content: string;
+  attachments?: Artifact[];
+};
+
+export type AgentEventTypes =
+  | "kUnknownEventType"
+  | "kStart"
+  | "kDelta"
+  | "kFinish"
+  | "kArtifact";
+
+export type AgentMessage = {
+  eventType: AgentEventTypes;
+  content: string;
+};
+
+export type PluginMessage = {
+  eventType: AgentEventTypes;
+  plugin: PluginInfo;
+  invocationId: number;
+  content: string;
+  attachments?: Artifact[];
+};
+
+export type WebSocketMessage =
+  | { type: "user"; user: UserMessage }
+  | { type: "agent"; agent: AgentMessage }
+  | { type: "plugin"; plugin: PluginMessage }
+  | { type: "error"; error: ErrorEvent };
+
+export type Role = "kUser" | "kAgent" | "kPlugin";
+
+export interface Artifact {
+  file_name: string;
+  mime_type: string;
+  content: string;
+  size_bytes: number;
+}
+
+export interface MinimalArtifact {
+  file_name: string;
+  mime_type: string;
+}
 
 export type TextMessagePart = {
   type: "text";
@@ -324,51 +374,11 @@ export type MessagePart = TextMessagePart | ImageMessagePart;
 
 export type MessageContent = string | MessagePart[];
 
-export interface ToolCall {
-  id: string;
-  type: "function";
-  function: {
-    name: string;
-    arguments: string;
-  };
-}
-
-export interface ToolCallDelta {
-  id?: string;
-  type?: "function";
-  function?: {
-    name?: string;
-    arguments?: string;
-  };
-}
-
-export interface ToolResultChatMessage {
-  role: "tool";
-  content: string;
-  toolCallId: string;
-}
-
-export interface UserChatMessage {
-  role: "user";
-  content: MessageContent;
-}
-
-export interface AssistantChatMessage {
-  role: "assistant";
-  content: MessageContent;
-  toolCalls?: ToolCallDelta[];
-}
-
-export interface SystemChatMessage {
-  role: "system";
-  content: string;
-}
-
 export type ChatMessage =
-  | UserChatMessage
-  | AssistantChatMessage
-  | SystemChatMessage
-  | ToolResultChatMessage;
+  | UserMessage
+  | AgentMessage
+  | PluginMessage
+  | ErrorEvent;
 
 export interface ContextItemId {
   providerTitle: string;
@@ -667,10 +677,10 @@ export interface IDE {
   getCurrentFile(): Promise<
     | undefined
     | {
-      isUntitled: boolean;
-      path: string;
-      contents: string;
-    }
+        isUntitled: boolean;
+        path: string;
+        contents: string;
+      }
   >;
 
   getLastFileSaveTimestamp?(): number;
@@ -794,6 +804,7 @@ export type TemplateType =
   | "phi2"
   | "phind"
   | "anthropic"
+  | "chimaera"
   | "chatml"
   | "none"
   | "openchat"
@@ -853,11 +864,11 @@ export interface CustomCommand {
 export interface Prediction {
   type: "content";
   content:
-  | string
-  | {
-    type: "text";
-    text: string;
-  }[];
+    | string
+    | {
+        type: "text";
+        text: string;
+      }[];
 }
 
 export interface ToolExtras {
@@ -1186,9 +1197,9 @@ export interface Config {
   embeddingsProvider?: EmbeddingsProviderDescription | ILLM;
   /** The model that Continue will use for tab autocompletions. */
   tabAutocompleteModel?:
-  | CustomLLM
-  | ModelDescription
-  | (CustomLLM | ModelDescription)[];
+    | CustomLLM
+    | ModelDescription
+    | (CustomLLM | ModelDescription)[];
   /** Options for tab autocomplete */
   tabAutocompleteOptions?: Partial<TabAutocompleteOptions>;
   /** UI styles customization */
@@ -1279,9 +1290,9 @@ export type PackageDetailsSuccess = PackageDetails & {
 export type PackageDocsResult = {
   packageInfo: ParsedPackageInfo;
 } & (
-    | { error: string; details?: never }
-    | { details: PackageDetailsSuccess; error?: never }
-  );
+  | { error: string; details?: never }
+  | { details: PackageDetailsSuccess; error?: never }
+);
 
 export interface TerminalOptions {
   reuseTerminal?: boolean;

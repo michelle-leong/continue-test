@@ -1,3 +1,5 @@
+import Websocket from "ws";
+
 async function* toAsyncIterable(
   nodeReadable: NodeJS.ReadableStream,
 ): AsyncGenerator<Uint8Array> {
@@ -109,6 +111,81 @@ export async function* streamJSON(response: Response): AsyncGenerator<any> {
       const data = JSON.parse(line);
       yield data;
       buffer = buffer.slice(position + 1);
+    }
+  }
+}
+
+export async function* streamWebSocket<T>(
+  url: string,
+  message: any,
+  signal: AbortSignal,
+): AsyncGenerator<T> {
+  const ws = new Websocket(url);
+
+  await new Promise<void>((resolve, reject) => {
+    ws.onopen = () => {
+      ws.send(JSON.stringify(message));
+      resolve();
+    };
+    ws.onerror = (err) => reject(err);
+  });
+
+  signal.addEventListener("abort", () => {
+    ws.close();
+  });
+
+  let resolveMessage: (value: T | PromiseLike<T>) => void;
+  let rejectMessage: (reason?: any) => void;
+  let messagePromise = new Promise<T>((resolve, reject) => {
+    resolveMessage = resolve;
+    rejectMessage = reject;
+  });
+
+  let finished = false;
+  let finalContentYielded = false;
+
+  ws.onmessage = (event) => {
+    let dataString: string;
+
+    if (typeof event.data === "string") {
+      dataString = event.data;
+    } else if (event.data instanceof ArrayBuffer) {
+      dataString = new TextDecoder("utf-8").decode(event.data);
+    } else {
+      console.error("Unsupported data type:", typeof event.data);
+      return;
+    }
+
+    const data = JSON.parse(dataString);
+    if (data.agent && data.agent.eventType === "kDelta") {
+      // Resolve the promise with the new content
+      resolveMessage(data.agent.content as T);
+      // Create a new promise for the next message
+      messagePromise = new Promise<T>((resolve, reject) => {
+        resolveMessage = resolve;
+        rejectMessage = reject;
+      });
+    } else if (data.agent && data.agent.eventType === "kFinish") {
+      // Resolve the promise with the final content and mark as finished
+      resolveMessage(data.agent.content as T);
+      finished = true;
+      ws.close();
+    }
+  };
+
+  while (!finished || !finalContentYielded) {
+    try {
+      const content = await messagePromise;
+      yield content;
+      if (finished) {
+        finalContentYielded = true;
+      }
+    } catch (error) {
+      if (signal.aborted) {
+        ws.close();
+        throw new Error("Aborted");
+      }
+      throw error;
     }
   }
 }

@@ -821,6 +821,17 @@ export const models: { [key: string]: ModelPackage } = {
     icon: "mistral.png",
     isOpenSource: true,
   },
+  chimaera: {
+    title: "Chimaera",
+    description: "Chimaera chatbot.",
+    params: {
+      title: "Chimaera",
+      model: "chimaera",
+      contextLength: 128_000,
+    },
+    icon: "mistral.png",
+    isOpenSource: true,
+  },
   geminiPro: {
     title: "Gemini Pro",
     description: "A highly capable model created by Google DeepMind",

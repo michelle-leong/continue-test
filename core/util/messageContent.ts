@@ -7,25 +7,11 @@ import {
 } from "../index";
 
 export function stripImages(messageContent: MessageContent): string {
-  if (typeof messageContent === "string") {
-    return messageContent;
-  }
-
-  return messageContent
-    .filter((part) => part.type === "text")
-    .map((part) => (part as TextMessagePart).text)
-    .join("\n");
+  return messageContent;
 }
 
 export function renderChatMessage(message: ChatMessage): string {
-  switch (message.role) {
-    case "user":
-    case "assistant":
-    case "system":
-      return stripImages(message.content);
-    case "tool":
-      return message.content;
-  }
+  return message.content;
 }
 
 export function renderContextItems(contextItems: ContextItem[]): string {
